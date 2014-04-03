@@ -1,0 +1,125 @@
+
+This is the first public release of the spherical harmonics rotation library
+Date: April 13, 2012
+
+Version 0.3 - First external release.
+
+%% Copyright (C) 2009-2012: Leslie Greengard and Zydrunas Gimbutas
+%% Contact: greengard@cims.nyu.edu
+%% 
+%% This program is free software; you can redistribute it and/or modify 
+%% it under the terms of the GNU General Public License as published by 
+%% the Free Software Foundation; either version 2 of the License, or 
+%% (at your option) any later version.  This program is distributed in 
+%% the hope that it will be useful, but WITHOUT ANY WARRANTY; without 
+%% even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+%% PARTICULAR PURPOSE.  See the GNU General Public License for more 
+%% details. You should have received a copy of the GNU General Public 
+%% License along with this program; 
+%% if not, see <http://www.gnu.org/licenses/>.
+
+./ - Fortran source code and drivers
+matlab/ - matlab scripts and mex files 
+contrib/mwrap-0.33.3/ - mwrap source code
+
+
+To test the library, please type 'make all'. 
+
+
+Fortran
+=======
+
+rotproj_cmpl.f    Rotate the complex spherical harmonic expansion 
+                  about the Y-axis (pseudo-spectral projection scheme)
+
+rotproj_cmpl2.f    Rotate the complex spherical harmonic expansion 
+                   about the X-axis then about the Y-axis
+		   (pseudo-spectral projection scheme)
+
+rotviarecur3.f    Rotate the complex spherical harmonic expansion 
+                  about the Y-axis (recurrence scheme)
+
+Matlab
+======
+
+rotviaproj.m -  Rotate the complex spherical harmonic expansion 
+                about the Y-axis (pseudo-spectral projection scheme)
+
+rotviarecur.m  -  Rotate the complex spherical harmonic expansion 
+                  about the Y-axis (recurrence scheme)
+
+
+The main routines are in rotproj_cmpl.f and rotviarecur3.f, with the
+drivers in rotproj_dr.f and rotviarecur3_dr.f.  The supplied makefile
+assumes that you have gfortran installed and will run timing and
+precision tests for both recursion and projection based (the
+projection algorithm from the paper) schemes.
+
+Note that we define Ynm(theta,phi) = sqrt( 2n+1) sqrt((n-m)!/(n+m)!)
+Pnm(cos theta) e^(im phi) Yn,-m(theta,phi) = sqrt( 2n+1)
+sqrt((n-m)!/(n+m)!) Pnm(cos theta) e^(-im phi) for m >= 0, without
+Condon-Shortley phase convention, and we are also omitting the
+normalization factor 1/(4pi) - different communities have
+disagreements on these conventions.
+
+
+
+$ make all
+gfortran -O2 rotviarecur3_dr.f rotviarecur3.f 
+./a.out
+ recur_test
+ nterms=
+     100
+ angle=
+  0.10472E+01
+ time/call=
+  0.44002E-02
+ speed=
+  0.22726E+03
+ errors=
+  0.00000E+00  0.00000E+00  0.00000E+00  0.00000E+00  0.11102E-15  0.55511E-16
+  0.00000E+00  0.00000E+00  0.27756E-16  -.27756E-16  0.83267E-16  0.55511E-16
+  0.19429E-15  0.19429E-15  0.11102E-15  0.55511E-16  0.11102E-15  0.22204E-15
+  0.11102E-15  0.30531E-15  0.27756E-15  0.33307E-15  0.33307E-15  0.41633E-15
+  0.44409E-15  0.58287E-15  0.55511E-15  0.61062E-15  0.80491E-15  0.74940E-15
+  0.10825E-14  0.11935E-14  0.16237E-14  0.19429E-14  0.21788E-14  0.28033E-14
+  0.35666E-14  0.41495E-14  0.51348E-14  0.60368E-14  0.74385E-14  0.87430E-14
+  0.10186E-13  0.12018E-13  0.14280E-13  0.16515E-13  0.19429E-13  0.22829E-13
+  0.26396E-13  0.30545E-13  0.35291E-13  0.40024E-13  0.44936E-13  0.49780E-13
+  0.53818E-13  0.57288E-13  0.59064E-13  0.58509E-13  0.55400E-13  0.48378E-13
+  0.36443E-13  0.18222E-13  -.86875E-14  -.46685E-13  -.99198E-13  -.17135E-12
+  -.26892E-12  -.39985E-12  -.57297E-12  -.79887E-12  -.10894E-11  -.14583E-11
+  -.19196E-11  -.24899E-11  -.31879E-11  -.40364E-11  -.50666E-11  -.63199E-11
+  -.78566E-11  -.97605E-11  -.12148E-10  -.15177E-10  -.19051E-10  -.24030E-10
+  -.30430E-10  -.38624E-10  -.49035E-10  -.62138E-10  -.78445E-10  -.98507E-10
+  -.12292E-09  -.15232E-09  -.18748E-09  -.22928E-09  -.27889E-09  -.33783E-09
+  -.40813E-09  -.49252E-09  -.59463E-09  -.71913E-09  -.87195E-09
+gfortran -O2 rotproj_cmpl_dr.f rotproj_cmpl.f dfft.f yrecursion.f 
+./a.out
+ proj_test
+ nterms=
+     100
+ angle=
+  0.10472E+01
+ time/call=
+  0.72004E-02
+ speed=
+  0.13888E+03
+ errors=
+  0.00000E+00  0.11102E-15  0.55511E-16  0.11102E-15  0.55511E-16  -.11102E-15
+  0.00000E+00  -.55511E-16  0.27756E-16  -.13878E-15  0.00000E+00  -.27756E-16
+  0.27756E-16  0.55511E-16  -.55511E-16  -.27756E-16  -.55511E-16  0.55511E-16
+  -.13878E-15  0.55511E-16  -.55511E-16  0.83267E-16  -.27756E-16  0.55511E-16
+  -.27756E-16  0.11102E-15  -.27756E-16  0.00000E+00  0.55511E-16  -.83267E-16
+  0.00000E+00  -.27756E-16  0.41633E-16  0.97145E-16  -.97145E-16  -.69389E-16
+  0.97145E-16  -.97145E-16  0.41633E-16  -.83267E-16  0.12490E-15  0.83267E-16
+  -.41633E-16  -.12490E-15  0.26368E-15  -.18041E-15  0.12490E-15  -.27756E-16
+  0.27756E-16  -.18041E-15  0.16653E-15  -.69389E-16  0.41633E-16  -.41633E-16
+  -.41633E-16  0.27756E-16  0.13878E-15  -.13878E-15  -.13878E-16  -.41633E-16
+  -.11102E-15  0.16653E-15  0.13878E-16  0.55511E-16  -.13878E-16  0.24980E-15
+  -.27756E-16  0.34694E-15  -.29143E-15  0.16653E-15  -.12490E-15  0.16653E-15
+  -.55511E-16  0.22204E-15  -.12490E-15  0.26368E-15  -.18041E-15  0.23592E-15
+  -.55511E-16  0.69389E-16  0.69389E-16  0.13878E-16  0.11102E-15  0.27756E-15
+  0.55511E-16  -.69389E-16  0.19429E-15  -.55511E-16  -.27756E-16  0.41633E-16
+  0.19429E-15  -.15266E-15  0.18041E-15  -.12490E-15  0.54123E-15  -.37470E-15
+  0.45797E-15  -.36082E-15  0.48572E-15  -.12490E-15  0.20817E-15
